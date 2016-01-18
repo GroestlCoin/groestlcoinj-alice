@@ -76,7 +76,7 @@ public class PeerGroup implements TransactionBroadcaster {
      * were only sending transactions to two peers and sometimes this wasn't reliable enough: transactions wouldn't
      * get through.
      */
-    public static final int DEFAULT_CONNECTIONS = 12;
+    public static final int DEFAULT_CONNECTIONS = 4;
     private static final int TOR_TIMEOUT_SECONDS = 60;
     private volatile int vMaxPeersToDiscoverCount = 100;
 
@@ -191,6 +191,7 @@ public class PeerGroup implements TransactionBroadcaster {
             // and possibly retransmit if so. The recalculation process will end up including the tx hash into the
             // filter. In case (1), we need to retransmit the filter to the connected peers. In case (2), we don't
             // and shouldn't, we should just recalculate and cache the new filter for next time.
+            log.debug("DEBUG Transaction Received: %s"+tx.toString());
             for (TransactionOutput output : tx.getOutputs()) {
                 if (output.getScriptPubKey().isSentToRawPubKey() && output.isMine(wallet)) {
                     if (tx.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
@@ -1785,7 +1786,7 @@ public class PeerGroup implements TransactionBroadcaster {
                 if (max <= 1)
                     return max;
                 else
-                    return (int) Math.round(getMaxConnections() * 0.8);
+                    return 2;//(int) Math.round(getMaxConnections() * 0.8);
             }
             return minBroadcastConnections;
         } finally {

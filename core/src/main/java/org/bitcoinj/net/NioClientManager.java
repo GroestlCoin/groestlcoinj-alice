@@ -82,7 +82,7 @@ public class NioClientManager extends AbstractExecutionThreadService implements 
                 data.future.setException(cause);
                 data.future = null;
             }
-        } else // Process bytes read
+        } else if(key.isValid()) // Process bytes read
             ConnectionHandler.handleKey(key);
     }
 

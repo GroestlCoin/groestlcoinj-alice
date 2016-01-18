@@ -1,9 +1,9 @@
 package crypto.difficulty;
 
-import com.google.groestlcoin.core.Sha256Hash;
-import com.google.groestlcoin.core.StoredBlock;
-import com.google.groestlcoin.store.BlockStore;
-import com.google.groestlcoin.store.BlockStoreException;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.StoredBlock;
+import org.bitcoinj.store.BlockStore;
+import org.bitcoinj.store.BlockStoreException;
 
 /**
  * Created by Hash Engineering Solutions on 6/4/14.
@@ -35,15 +35,8 @@ public class Utils {
         {
             if(block == null || block.getHeader().getPrevBlockHash().equals(Sha256Hash.ZERO_HASH))
                 return null;
-            if(block.getHeader().getAlgo() == algo)
-                return block;
-            try {
-                block = block.getPrev(blockStore);
-            }
-            catch(BlockStoreException x)
-            {
-                return null;
-            }
+
+            return block;
         }
 
     }
@@ -60,7 +53,7 @@ public class Utils {
         {
             try {
                 block = block.getPrev(blockStore);
-                block = getLastBlockForAlgo(block, currentBlock.getHeader().getAlgo(), blockStore);
+                block = getLastBlockForAlgo(block, 0, blockStore);
                 if(block == null)
                     return 0.0;
             }

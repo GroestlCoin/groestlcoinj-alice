@@ -3298,7 +3298,7 @@ public class Wallet extends BaseTaggableObject implements Serializable, BlockCha
          * <p>You might also consider adding a {@link SendRequest#feePerKb} to set the fee per kb of transaction size
          * (rounded down to the nearest kb) as that is how transactions are sorted when added to a block by miners.</p>
          */
-        public Coin fee = null;
+        public Coin fee = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE;
 
         /**
          * <p>A transaction can have a fee attached, which is defined as the difference between the input values

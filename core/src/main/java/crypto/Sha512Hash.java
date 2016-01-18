@@ -16,9 +16,9 @@
 
 package crypto;
 
-import com.google.groestlcoin.core.Sha256Hash;
-import com.google.groestlcoin.core.Utils;
 import com.google.common.io.ByteStreams;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Utils;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.File;

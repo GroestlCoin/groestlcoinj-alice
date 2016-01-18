@@ -1,6 +1,9 @@
 package org.bitcoinj.core;
 
+import org.bitcoinj.net.discovery.HttpDiscovery;
+
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -13,7 +16,7 @@ import java.util.Map;
 public class CoinDefinition {
 
 
-    public static final String coinName = "Groestlcoin";
+    public static final String coinName = "GroestlCoin";
     public static final String coinTicker = "GRS";
     public static final String coinURIScheme = "groestlcoin";
     public static final String cryptsyMarketId = "26";
@@ -101,7 +104,38 @@ public class CoinDefinition {
 
     public static final int Port    = 1331;       //protocol.h GetDefaultPort(testnet=false)
     public static final int TestPort = 17777;     //protocol.h GetDefaultPort(testnet=true)
+    public static final HttpDiscovery.Details[] httpSeeds = new HttpDiscovery.Details[] {
+            new HttpDiscovery.Details(
+                    ECKey.fromPublicOnly(Utils.HEX.decode("0248876142c407e9a05a07f96caf212eb5b54b68845ddee44739094b02e24d13e4")),
+                    URI.create("http://groestlcoin.org:8080/peers")
+            )
+    };
 
+    public static final int[] addrSeeds = new int[] {
+            0x68EC82DE,
+            0x68EC85C4,
+            0x68ECB2F5,
+            0x904CEF42,
+            0x95D2E231,
+            0xBC8648D5,
+            0xC06306CF,
+            0xC18862B8,
+            0xC6C7692B,
+            0xD2BA3B44,
+            0x1715CC22,
+            0x253B180F,
+            0x2A738931,
+            0x05092709,
+            0x36DF4CA5,
+            0x482E98FA,
+            0x4C707B0D,
+            0x535418B4,
+            0x5402225E,
+            0x5762B9F4,
+            0x5E17217A,
+            0x5E1737D3,
+            0x5F85745C,
+            0x5F85782F};
     //
     //  Production
     //
@@ -121,7 +155,6 @@ public class CoinDefinition {
 
     static public String genesisTxInBytes = "04ffff001d0104325072657373757265206d75737420626520707574206f6e20566c6164696d697220507574696e206f766572204372696d6561";   //"Digitalcoin, A Currency for a Digital Age"
     static public String genesisTxOutBytes = "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f";
-
 
 
     static public String genesisMerkleRoot = "3ce968df58f9c8a752306c4b7264afab93149dbc578bd08a42c446caaa6628bb";

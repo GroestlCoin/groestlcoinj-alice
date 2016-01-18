@@ -107,7 +107,10 @@ public class TransactionOutput extends ChildMessage implements Serializable {
         checkArgument(value.compareTo(NetworkParameters.MAX_MONEY) < 0, "Values larger than MAX_MONEY not allowed");
         this.value = value.value;
         this.scriptBytes = scriptBytes;
-        setParent(parent);
+        if(parent == null)
+            this.parent = parent;
+        else
+            setParent(parent);
         availableForSpending = true;
         length = 8 + VarInt.sizeOf(scriptBytes.length) + scriptBytes.length;
     }

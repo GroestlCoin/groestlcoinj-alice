@@ -61,6 +61,7 @@ public class ForwardingService {
             params = MainNetParams.get();
             filePrefix = "forwarding-service";
         }
+
         // Parse the address given as the first parameter.
         forwardingAddress = new Address(params, args[0]);
 
@@ -78,9 +79,10 @@ public class ForwardingService {
         kit.awaitRunning();
 
         // We want to know when we receive money.
+
         kit.wallet().addEventListener(new AbstractWalletEventListener() {
             @Override
-            public void onCoinsReceived(Wallet w, Transaction tx, Coin prevBalance, Coin newBalance) {
+            public void onCoinsReceived(Wallet w,final Transaction tx, Coin prevBalance, Coin newBalance) {
                 // Runs in the dedicated "user thread" (see bitcoinj docs for more info on this).
                 //
                 // The transaction "tx" can either be pending, or included into a block (we didn't see the broadcast).
@@ -94,8 +96,10 @@ public class ForwardingService {
                 // be called in onSetupCompleted() above. But we don't do that here to demonstrate the more common
                 // case of waiting for a block.
                 Futures.addCallback(tx.getConfidence().getDepthFuture(1), new FutureCallback<TransactionConfidence>() {
+
                     @Override
                     public void onSuccess(TransactionConfidence result) {
+
                         forwardCoins(tx);
                     }
 

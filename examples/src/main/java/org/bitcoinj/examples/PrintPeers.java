@@ -74,11 +74,13 @@ public class PrintPeers {
         System.out.println("Scanning " + addrs.size() + " peers:");
 
         final NetworkParameters params = MainNetParams.get();
+        new org.bitcoinj.core.Context(params);
         final Object lock = new Object();
         final long[] bestHeight = new long[1];
 
         List<ListenableFuture<Void>> futures = Lists.newArrayList();
         NioClientManager clientManager = new NioClientManager();
+        java.lang.System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
         for (final InetAddress addr : addrs) {
             InetSocketAddress address = new InetSocketAddress(addr, params.getPort());
             final Peer peer = new Peer(params, new VersionMessage(params, 0), null, new PeerAddress(address));

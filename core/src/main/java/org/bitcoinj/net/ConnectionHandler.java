@@ -226,7 +226,7 @@ class ConnectionHandler implements MessageWriteTarget {
                 // position)
                 handler.readBuff.compact();
             }
-            if (key.isWritable())
+            if (key.isWritable() && key.isValid())
                 handler.tryWriteBytes();
         } catch (Exception e) {
             // This can happen eg if the channel closes while the thread is about to get killed

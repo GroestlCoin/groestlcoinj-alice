@@ -16,6 +16,8 @@
 
 package org.bitcoinj.core;
 
+import crypto.Groestl;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -147,8 +149,8 @@ public class Base58 {
             throw new AddressFormatException("Input too short");
         byte[] bytes = copyOfRange(tmp, 0, tmp.length - 4);
         byte[] checksum = copyOfRange(tmp, tmp.length - 4, tmp.length);
-        
-        tmp = Sha256Hash.hashTwice(bytes);
+
+        tmp = Groestl.digest(bytes);
         byte[] hash = copyOfRange(tmp, 0, 4);
         if (!Arrays.equals(checksum, hash)) 
             throw new AddressFormatException("Checksum does not validate");

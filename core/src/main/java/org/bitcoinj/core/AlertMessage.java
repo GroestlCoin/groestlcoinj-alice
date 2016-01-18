@@ -16,6 +16,8 @@
 
 package org.bitcoinj.core;
 
+import crypto.Groestl;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,7 +114,7 @@ public class AlertMessage extends Message {
      * doesn't verify, because that would allow arbitrary attackers to spam your users.
      */
     public boolean isSignatureValid() {
-        return ECKey.verify(Sha256Hash.hashTwice(content), signature, params.getAlertSigningKey());
+        return ECKey.verify(Groestl.digest(content), signature, params.getAlertSigningKey());
     }
 
     @Override

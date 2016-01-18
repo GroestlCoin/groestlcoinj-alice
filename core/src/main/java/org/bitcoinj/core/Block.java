@@ -17,6 +17,7 @@
 
 package org.bitcoinj.core;
 
+import crypto.Groestl;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import com.google.common.annotations.VisibleForTesting;
@@ -104,12 +105,17 @@ public class Block extends Message {
     Block(NetworkParameters params) {
         super(params);
         // Set up a few basic things. We are not complete after this though.
-        version = 1;
+        version = CoinDefinition.BLOCK_CURRENTVERSION;
         difficultyTarget = 0x1d07fff8L;
         time = System.currentTimeMillis() / 1000;
         prevBlockHash = Sha256Hash.ZERO_HASH;
 
         length = 80;
+    }
+
+    public void setVersion(int v)
+    {
+        version = v;
     }
 
     /** Constructs a block object from the Bitcoin wire format. */
@@ -191,7 +197,7 @@ public class Block extends Message {
         difficultyTarget = readUint32();
         nonce = readUint32();
 
-        hash = Sha256Hash.wrapReversed(Sha256Hash.hashTwice(payload, offset, cursor));
+        hash = Sha256Hash.wrap(Utils.reverseBytes(Groestl.digest(payload, offset, cursor)/*Utils.doubleDigest(payload, offset, cursor)*/));
 
         headerParsed = true;
         headerBytesValid = parseRetain;
@@ -511,7 +517,7 @@ public class Block extends Message {
         try {
             ByteArrayOutputStream bos = new UnsafeByteArrayOutputStream(HEADER_SIZE);
             writeHeader(bos);
-            return Sha256Hash.wrapReversed(Sha256Hash.hashTwice(bos.toByteArray()));
+            return Sha256Hash.wrap(Utils.reverseBytes(Groestl.digest(bos.toByteArray())/*doubleDigest(bos.toByteArray())*/));
         } catch (IOException e) {
             throw new RuntimeException(e); // Cannot happen.
         }

@@ -17,6 +17,7 @@
 
 package org.bitcoinj.core;
 
+import crypto.Groestl;
 import org.bitcoinj.crypto.*;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -842,7 +843,7 @@ public class ECKey implements EncryptableItem, Serializable {
      */
     public String signMessage(String message, @Nullable KeyParameter aesKey) throws KeyCrypterException {
         byte[] data = Utils.formatMessageForSigning(message);
-        Sha256Hash hash = Sha256Hash.twiceOf(data);
+        Sha256Hash hash = Sha256Hash.of(data);
         ECDSASignature sig = sign(hash, aesKey);
         // Now we have to work backwards to figure out the recId needed to recover the signature.
         int recId = -1;
@@ -894,9 +895,10 @@ public class ECKey implements EncryptableItem, Serializable {
         BigInteger s = new BigInteger(1, Arrays.copyOfRange(signatureEncoded, 33, 65));
         ECDSASignature sig = new ECDSASignature(r, s);
         byte[] messageBytes = Utils.formatMessageForSigning(message);
+
         // Note that the C++ code doesn't actually seem to specify any character encoding. Presumably it's whatever
         // JSON-SPIRIT hands back. Assume UTF-8 for now.
-        Sha256Hash messageHash = Sha256Hash.twiceOf(messageBytes);
+        Sha256Hash messageHash = Sha256Hash.of(messageBytes);
         boolean compressed = false;
         if (header >= 31) {
             compressed = true;

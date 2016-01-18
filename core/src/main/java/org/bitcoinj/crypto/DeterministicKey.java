@@ -16,6 +16,7 @@
  */
 package org.bitcoinj.crypto;
 
+import crypto.Groestl;
 import org.bitcoinj.core.*;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -283,7 +284,7 @@ public class DeterministicKey extends ECKey {
         int inputLength = input.length;
         byte[] checksummed = new byte[inputLength + 4];
         System.arraycopy(input, 0, checksummed, 0, inputLength);
-        byte[] checksum = Sha256Hash.hashTwice(input);
+        byte[] checksum = Groestl.digest(input);//Utils.doubleDigest(input);
         System.arraycopy(checksum, 0, checksummed, inputLength, 4);
         return checksummed;
     }

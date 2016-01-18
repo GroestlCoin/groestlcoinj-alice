@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Resources;
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.UnsignedLongs;
 import org.spongycastle.crypto.digests.RIPEMD160Digest;
@@ -34,6 +35,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,12 +54,20 @@ import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterrup
 public class Utils {
 
     /** The string that prefixes all text messages signed using Bitcoin keys. */
-    public static final String BITCOIN_SIGNED_MESSAGE_HEADER = "Bitcoin Signed Message:\n";
+    public static final String BITCOIN_SIGNED_MESSAGE_HEADER = CoinDefinition.coinName + " Signed Message:\n";
     public static final byte[] BITCOIN_SIGNED_MESSAGE_HEADER_BYTES = BITCOIN_SIGNED_MESSAGE_HEADER.getBytes(Charsets.UTF_8);
 
     private static final Joiner SPACE_JOINER = Joiner.on(" ");
 
     private static BlockingQueue<Boolean> mockSleepQueue;
+    private static final MessageDigest digest;
+    static {
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
+    }
 
     /**
      * The regular {@link java.math.BigInteger#toByteArray()} method isn't quite what we often need: it appends a
@@ -102,6 +113,41 @@ public class Utils {
         out[offset + 6] = (byte) (0xFF & (val >> 48));
         out[offset + 7] = (byte) (0xFF & (val >> 56));
     }
+
+    /**
+     * Returns the given byte array hex encoded.
+     */
+    public static String bytesToHexString(byte[] bytes) {
+        StringBuffer buf = new StringBuffer(bytes.length * 2);
+        for (byte b : bytes) {
+            String s = Integer.toString(0xFF & b, 16);
+            if (s.length() < 2)
+                buf.append('0');
+            buf.append(s);
+        }
+        return buf.toString();
+    }
+
+        /**
+     * See {@link Utils#doubleDigest(byte[], int, int)}.
+     */
+    public static byte[] doubleDigest(byte[] input) {
+        return doubleDigest(input, 0, input.length);
+    }
+
+    /**
+     * Calculates the SHA-256 hash of the given byte range, and then hashes the resulting hash again. This is
+     * standard procedure in Bitcoin. The resulting hash is in big endian form.
+     */
+    public static byte[] doubleDigest(byte[] input, int offset, int length) {
+        synchronized (digest) {
+            digest.reset();
+            digest.update(input, offset, length);
+            byte[] first = digest.digest();
+            return digest.digest(first);
+        }
+    }
+
 
     public static void uint32ToByteStreamLE(long val, OutputStream stream) throws IOException {
         stream.write((int) (0xFF & val));
@@ -640,4 +686,37 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * How many "nanocoins" there are in a Bitcoin.
+     * <p/>
+     * A nanocoin is the smallest unit that can be transferred using Bitcoin.
+     * The term nanocoin is very misleading, though, because there are only 100 million
+     * of them in a coin (whereas one would expect 1 billion.
+     */
+    public static final BigInteger COIN = new BigInteger("100000000", 10);
+
+    /**
+     * How many "nanocoins" there are in 0.01 BitCoins.
+     * <p/>
+     * A nanocoin is the smallest unit that can be transferred using Bitcoin.
+     * The term nanocoin is very misleading, though, because there are only 100 million
+     * of them in a coin (whereas one would expect 1 billion).
+     */
+    public static final BigInteger CENT = new BigInteger("1000000", 10);
+
+    /**
+     * Convert an amount expressed in the way humans are used to into nanocoins.
+     */
+    public static BigInteger toNanoCoins(int coins, int cents) {
+        checkArgument(cents < 100);
+        checkArgument(cents >= 0);
+        checkArgument(coins >= 0);
+        checkArgument(coins < NetworkParameters.MAX_MONEY.divide(Utils.COIN.longValue()).longValue());
+        BigInteger bi = BigInteger.valueOf(coins).multiply(COIN);
+        bi = bi.add(BigInteger.valueOf(cents).multiply(CENT));
+        return bi;
+    }
+
+
 }

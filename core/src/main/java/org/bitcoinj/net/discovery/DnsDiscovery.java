@@ -17,6 +17,8 @@
 
 package org.bitcoinj.net.discovery;
 
+import com.google.common.collect.Lists;
+import com.squareup.okhttp.OkHttpClient;
 import org.bitcoinj.core.*;
 import org.bitcoinj.utils.*;
 
@@ -60,6 +62,7 @@ public class DnsDiscovery extends MultiplexingDiscovery {
         if (seeds != null)
             for (String seed : seeds)
                 discoveries.add(new DnsSeedDiscovery(params, seed));
+
         return discoveries;
     }
 
